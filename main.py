@@ -1,0 +1,49 @@
+from resources import execute
+
+
+def start():
+    print("Hello, welcome to the steam inventory value calculator!")
+    print()
+    steam_id_valid=False
+    while steam_id_valid is False:
+        try:
+            steam_id=int(input("To start insert here your steamID64 ID: "))
+            print()
+            
+            if(len(str(steam_id))!=17):
+                print("SteamID64 needs to be and integer with 17 caracters")
+                print("Please try inserting again!")
+                print()
+            else:
+                steam_id_valid=True
+        except ValueError:
+            print("SteamID64 needs to be an integer with 17 caracters")
+            print("Please try inserting again!")
+            print()
+
+
+    currency_valid=False
+    currency_menu="Choose the currency for the calculation:\n 1.EUR (€)\n 2.USD ($)\n 3.GBP (£)\n 4.BRL (R$)\n 5.RUB (pуб.)\n 6.CAD (CDN$)\n 7.TWD (NT$)\n 8.ZAR (R)\n"
+
+    dict_currency_code={1:3,2:1,3:2,4:7,5:5,6:20,7:23,8:34}
+    while currency_valid is False:
+        print(currency_menu)
+        try:
+            user_input= int(input("Choose your currency option (1 to 8): "))
+            print()
+            if(user_input)<1 or user_input>8:
+                print("Currency option invalid. The valid options are 1 to 8 corresponding to the currency´s in the menu above")
+                print("Please try inserting again!")
+                print()
+            else:
+                currency_valid=True
+        except ValueError:
+            print("Currency option needs to be an integer between 1 and 8.")
+            print("Please try inserting again!")
+
+    currency_id=dict_currency_code.get(user_input)
+
+    execute(steam_id,currency_id)
+            
+        
+start()
