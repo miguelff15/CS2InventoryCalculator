@@ -82,10 +82,31 @@ def getSkinPrice(market_skin_name:str,currency_id:int):
 
     if data.get("success"):
         lowest_price = data.get("lowest_price")
-        if(lowest_price !=None):
-            currency=lowest_price [-1]
-            price=float(lowest_price [:-1].replace(",",".").replace(" ", "").replace("--","00"))
-            time.sleep(3.5)   
+        if currency_id==3:
+
+            if(lowest_price !=None):
+                currency="€"
+                price=float(lowest_price.replace(currency,"").replace(",",".").replace(" ", "").replace("--","00"))
+
+        elif currency_id==1: 
+            if(lowest_price !=None):
+                currency="$"
+                price=float(lowest_price.replace(currency,"").replace(",",".").replace(" ", "").replace("--","00"))
+
+        elif currency_id==2:
+            currency="£" 
+            price=float(lowest_price.replace(currency,"").replace(",",".").replace(" ", "").replace("--","00"))
+        elif currency_id==5: 
+            if(lowest_price !=None):
+                currency="руб"
+                price=float(lowest_price.replace(currency,"").replace(",",".").replace(" ", "").replace("--","00"))
+
+        elif currency_id==7:  
+            if(lowest_price !=None):
+                currency="R$"
+                price=float(lowest_price.replace(currency,"").replace(",",".").replace(" ", "").replace("--","00"))
+ 
+        time.sleep(3.5) 
 
     return (price,currency)
 
@@ -146,6 +167,7 @@ def execute(steam_id,currency_id):
     steam_id is an int with 17 characters containing the steamID64
     currency_id is an int with the code of the currency to be considered in the calculation
     """
+    currency_symbol_got=""
     if type(steam_id)!=int and len(str(steam_id))!=17:
         raise Exception ("SteamID64 needs to be and integer with 17 characters")
     
@@ -160,7 +182,7 @@ def execute(steam_id,currency_id):
     dict_skin_prices={}
     for i, skin in enumerate(skins_owned, 1):
             if skin not in dict_skin_prices:
-                preco_bruto, moeda = getSkinPrice(skin,currency_id) 
+                preco_bruto, currency_symbol_got = getSkinPrice(skin,currency_id) 
                 if preco_bruto > 0: 
                     preco_liquido = round(preco_bruto / 1.15, 2)
                     dict_skin_prices[skin]=(preco_bruto,preco_liquido)     
@@ -177,8 +199,11 @@ def execute(steam_id,currency_id):
     net_total_value=final_values_dict[1]
 
     save_to_csv([timestamp, gross_total_value, net_total_value])
-    print("\nExecution finished successfully!")
-    print(timestamp, gross_total_value, net_total_value)
+    print("\nExecution finished successfully!\n")
+    print("***FINAL RESULTS***")
+    print("GROSS INVENTORY VALUE: "+str(gross_total_value)+currency_symbol_got)
+    print("NET INVENTORY VALUE: "+str(net_total_value)+currency_symbol_got)
+    
 
-    print("Process complete. Check 'inventory_value.csv' file in this directory to see the detailed results.")
+    print("Check 'inventory_details.csv' file in this directory to see the detailed results.")
 
