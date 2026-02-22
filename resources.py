@@ -114,7 +114,7 @@ def create_report(steam_id, total_gross, total_net,dict_skin_prices, dict_skin_q
     timestamp_filename = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     timestamp_to_write = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
-    fileName = "report_"+timestamp_filename+".txt"
+    fileName = "reports/report_"+timestamp_filename+".txt"
 
     with open(fileName, "w", encoding="utf-8") as f:
         f.write("INVENTORY VALUE REPORT\n")
