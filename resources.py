@@ -20,7 +20,7 @@ def getSkinsFromInventory(steamUserId):
     
     start_assetid = None
     has_more = True
-    print("Getting the skins from the inventory...")
+    print("Getting the skins from the inventory...\n")
     while has_more:
         url ="https://steamcommunity.com/inventory/"+str(steamUserId)+"/730/2?l=english&count=75"
         if start_assetid:
@@ -80,46 +80,63 @@ def getSkinPrice(market_skin_name:str,currency_id:int):
     response = requests.get(url)
     data = response.json()
 
+    dict_code_symbol={3:"€",1:"$",2:"£",5:"руб",7:"R$"}
+    currency_symbol=dict_code_symbol.get(currency_id)
+
     if data.get("success"):
         lowest_price = data.get("lowest_price")
-        if currency_id==3:
 
-            if(lowest_price !=None):
-                currency="€"
-                price=float(lowest_price.replace(currency,"").replace(",",".").replace(" ", "").replace("--","00"))
+        if(lowest_price !=None):
+            price=float(lowest_price.replace(currency_symbol,"").replace(",",".").replace(" ", "").replace("--","00"))
 
-        elif currency_id==1: 
-            if(lowest_price !=None):
-                currency="$"
-                price=float(lowest_price.replace(currency,"").replace(",",".").replace(" ", "").replace("--","00"))
-
-        elif currency_id==2:
-            currency="£" 
-            price=float(lowest_price.replace(currency,"").replace(",",".").replace(" ", "").replace("--","00"))
-        elif currency_id==5: 
-            if(lowest_price !=None):
-                currency="руб"
-                price=float(lowest_price.replace(currency,"").replace(",",".").replace(" ", "").replace("--","00"))
-
-        elif currency_id==7:  
-            if(lowest_price !=None):
-                currency="R$"
-                price=float(lowest_price.replace(currency,"").replace(",",".").replace(" ", "").replace("--","00"))
- 
         time.sleep(3.5) 
 
-    return (price,currency)
+    return (price,currency_symbol)
 
 
 
-def save_to_csv(dados):
-    with open('inventory_value.csv', mode='a', newline='', encoding='utf-8') as ficheiro:
-        writer = csv.writer(ficheiro)
+def create_report(steam_id, total_gross, total_net,dict_skin_prices, dict_skin_quantities,currency):
+
+    temp_calculated = {}
+    
+    for skin, qty in dict_skin_quantities.items():
+        if skin in dict_skin_prices:
+            gross_unit = dict_skin_prices[skin][0]
+            net_unit = dict_skin_prices[skin][1]
         
-        if ficheiro.tell() == 0:
-            writer.writerow(['timestamp', 'net_value', 'gross_value'])
+            total_skin_gross = qty * gross_unit
+            total_skin_net = qty * net_unit
+            
+            temp_calculated[skin] = (total_skin_gross, total_skin_net)
+
+
+    sorted_items = dict(sorted(temp_calculated.items(), key=lambda item: item[1][1], reverse=True))
+    timestamp_filename = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    timestamp_to_write = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    fileName = "report_"+timestamp_filename+".txt"
+
+    with open(fileName, "w", encoding="utf-8") as f:
+        f.write("INVENTORY VALUE REPORT\n")
+        f.write("Timestamp: "+timestamp_to_write+"\n")
+        f.write("Steam Profile: https://steamcommunity.com/profiles/"+str(steam_id)+"\n\n")
         
-        writer.writerow(dados)
+        f.write("GROSS VALUE: "+str(total_skin_gross)+currency+"\n")
+        f.write("NET VALUE: "+str(total_skin_net)+currency+"\n")
+        
+        f.write("DETAILED INFO:\n\n")
+
+        f.write("SKIN                                     | GROSS VALUE     | NET VALUE\n")
+        f.write("-" * 75 + "\n")
+
+        for skin, data in sorted_items.items():
+            g_val = data[0]
+            n_val = data[1]
+
+            linha = skin.ljust(40) + " | " + str(round(g_val, 2)).ljust(15) + " | " + str(round(n_val, 2)) + "\n"
+            
+            f.write(linha)
+    return fileName
 
 
 def listToDict(skins_owned):
@@ -198,12 +215,13 @@ def execute(steam_id,currency_id):
     gross_total_value=final_values_dict[0]
     net_total_value=final_values_dict[1]
 
-    save_to_csv([timestamp, gross_total_value, net_total_value])
+    fileName=create_report(steam_id,gross_total_value,net_total_value,dict_skin_prices,dict_skin_quantities,currency_symbol_got)
+
     print("\nExecution finished successfully!\n")
-    print("***FINAL RESULTS***")
+    print("***FINAL SUMMARY RESULTS***")
     print("GROSS INVENTORY VALUE: "+str(gross_total_value)+currency_symbol_got)
     print("NET INVENTORY VALUE: "+str(net_total_value)+currency_symbol_got)
     
 
-    print("Check 'inventory_details.csv' file in this directory to see the detailed results.")
+    print("\nCheck the file "+fileName+"in this directory in the reports folder to see the detailed results.")
 
