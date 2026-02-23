@@ -1,10 +1,13 @@
 import requests
 from urllib.parse import quote
 import time
-import csv
 from datetime import datetime
 import requests
 import sys
+import os
+
+## resources.py - file containing main functions that allow the CS2InventoryCalculator to work
+
 
 def getSkinsFromInventory(steamUserId):
     """
@@ -76,8 +79,12 @@ def getSkinPrice(market_skin_name:str,currency_id:int):
     price=0
 
     name_prepared=quote(market_skin_name)
+
     url = "https://steamcommunity.com/market/priceoverview/?appid=730&currency="+str(currency_id)+"&market_hash_name="+name_prepared
+
     response = requests.get(url)
+    response.encoding = 'utf-8-sig'
+
     data = response.json()
 
     dict_code_symbol={3:"€",1:"$",2:"£",5:"руб",7:"R$"}
@@ -95,10 +102,19 @@ def getSkinPrice(market_skin_name:str,currency_id:int):
 
 
 
-def create_report(steam_id, total_gross, total_net,dict_skin_prices, dict_skin_quantities,currency):
-
+def create_report(steam_id,dict_skin_prices, dict_skin_quantities,currency,gross_total,net_total):
+    """
+    Creates a file with the detailed report of the calculation
+    Requires:
+    steam_id is an int with 17 characters containing the steamID64
+    dict_skin_prices is a dict with format {str:(float,float)}
+    dict_skin_quantities is a dict with format {str:integer}
+    currency is a str with the currency symbol
+    gross_total is a float with the total gross value previously calculated
+    net_total is a float with the total net value prviously calculated
+    """
     temp_calculated = {}
-    
+
     for skin, qty in dict_skin_quantities.items():
         if skin in dict_skin_prices:
             gross_unit = dict_skin_prices[skin][0]
@@ -110,10 +126,13 @@ def create_report(steam_id, total_gross, total_net,dict_skin_prices, dict_skin_q
             temp_calculated[skin] = (total_skin_gross, total_skin_net)
 
 
-    sorted_items = dict(sorted(temp_calculated.items(), key=lambda item: item[1][1], reverse=True))
+    sorted_items = dict(sorted(temp_calculated.items(), key=lambda item: item[1][0], reverse=True))
     timestamp_filename = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     timestamp_to_write = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    
+
+    if not os.path.exists("reports"):
+        os.makedirs("reports")
+
     fileName = "reports/report_"+timestamp_filename+".txt"
 
     with open(fileName, "w", encoding="utf-8") as f:
@@ -121,19 +140,19 @@ def create_report(steam_id, total_gross, total_net,dict_skin_prices, dict_skin_q
         f.write("Timestamp: "+timestamp_to_write+"\n")
         f.write("Steam Profile: https://steamcommunity.com/profiles/"+str(steam_id)+"\n\n")
         
-        f.write("GROSS VALUE: "+str(total_skin_gross)+currency+"\n")
-        f.write("NET VALUE: "+str(total_skin_net)+currency+"\n")
+        f.write("GROSS VALUE: "+str(gross_total)+currency+"\n")
+        f.write("NET VALUE (estimated (gross_value*0.85)): "+str(net_total)+currency+"\n")
         
         f.write("DETAILED INFO:\n\n")
 
-        f.write("SKIN                                     | GROSS VALUE     | NET VALUE\n")
-        f.write("-" * 75 + "\n")
+        f.write("SKIN                                                         | GROSS VALUE \n")
+        f.write("-" * 77+ "\n")
 
         for skin, data in sorted_items.items():
             g_val = data[0]
             n_val = data[1]
 
-            linha = skin.ljust(40) + " | " + str(round(g_val, 2)).ljust(15) + " | " + str(round(n_val, 2)) + "\n"
+            linha = skin.ljust(60) + " | " + str(round(g_val, 2)).ljust(15) +"\n"
             
             f.write(linha)
     return fileName
@@ -215,12 +234,12 @@ def execute(steam_id,currency_id):
     gross_total_value=final_values_dict[0]
     net_total_value=final_values_dict[1]
 
-    fileName=create_report(steam_id,gross_total_value,net_total_value,dict_skin_prices,dict_skin_quantities,currency_symbol_got)
+    fileName=create_report(steam_id,dict_skin_prices,dict_skin_quantities,currency_symbol_got,gross_total_value,net_total_value)
 
     print("\nExecution finished successfully!\n")
     print("***FINAL SUMMARY RESULTS***")
     print("GROSS INVENTORY VALUE: "+str(gross_total_value)+currency_symbol_got)
-    print("NET INVENTORY VALUE: "+str(net_total_value)+currency_symbol_got)
+    print("NET INVENTORY VALUE (estimated): "+str(net_total_value)+currency_symbol_got)
     
 
     print("\nCheck the file "+fileName+"in this directory in the reports folder to see the detailed results.")
