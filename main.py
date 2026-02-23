@@ -1,6 +1,6 @@
 from resources import execute
 
-
+## main.py - file containing start functions that gets inputs (steamID and currency) and executes the program
 def start():
     print("Hello, welcome to the steam inventory value calculator!")
     print()
@@ -40,10 +40,12 @@ def start():
         except ValueError:
             print("Currency option needs to be an integer between 1 and 5.")
             print("Please try inserting again!")
+            print()
 
     currency_id=dict_currency_code.get(user_input)
 
     execute(steam_id,currency_id)
             
         
-start()
+if __name__ == "__main__":
+    start()
