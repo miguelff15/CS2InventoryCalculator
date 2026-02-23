@@ -6,7 +6,7 @@ it generates a final report.txt file with these informations.
 
 How to execute the program:
 1) Download this project
-2) with the cd in the main folder (which contains the main.py, resources.py, and README.md)
+2) in a terminal with the path set to the main folder (which contains the main.py, resources.py, and README.md)
 3) just execute the command : **python3 main.py**
 4) then just type steamID64 
 5) then type a number between 1 and 5 to choose the currency of the calculation (codes and currency 
