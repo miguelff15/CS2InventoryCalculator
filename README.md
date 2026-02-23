@@ -3,6 +3,16 @@
 This project is a calculator for the steam market updated value of a Counter-Strike 2 Inventory and its individual items, 
 it generates a final report.txt file with these informations.
 
+
+How to execute the program:
+1) Download this project
+2) with the cd in the main folder (which contains the main.py, resources.py, and README.md)
+3) just execute the command : **python3 main.py**
+4) then just type steamID64 
+5) then type a number between 1 and 5 to choose the currency of the calculation (codes and currency 
+names/symbols are printed in the terminal)
+
+
 I decided to create this because it's something I used to do manually, and this way it's automatic, however there are still 
 some aspects to consider in this project:
 
