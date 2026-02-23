@@ -11,7 +11,12 @@ How to execute the program:
 4) then just type steamID64 
 5) then type a number between 1 and 5 to choose the currency of the calculation (codes and currency 
 names/symbols are printed in the terminal)
+6) Just wait for the program to finish execution (it shows a progress bar in the terminal), the summary results will be 
+shown in the terminal and the detailed ones will be in the report-YYYY-MM-DD-HH-MM-SS.txt file in the reports directory 
+(inside the main directory)
 
+
+**MORE INFORMATIONS ABOUT THIS PROJECT**:
 
 I decided to create this because it's something I used to do manually, and this way it's automatic, however there are still 
 some aspects to consider in this project:
