@@ -8,9 +8,9 @@ How to execute the program:
 1) Download this project
 2) in a terminal with the path set to the main folder (which contains the main.py, resources.py, and README.md)
 3) just execute the command : **python3 main.py**
-4) then just type steamID64 
+4) then just type the steamID64 of the profile you want to calculate and press enter
 5) then type a number between 1 and 5 to choose the currency of the calculation (codes and currency 
-names/symbols are printed in the terminal)
+names/symbols are printed in the terminal) and press enter
 6) Just wait for the program to finish execution (it shows a progress bar in the terminal), the summary results will be 
 shown in the terminal and the detailed ones will be in the report-YYYY-MM-DD-HH-MM-SS.txt file in the reports directory 
 (inside the main directory)
@@ -42,7 +42,7 @@ some aspects to consider in this project:
 
 What the program really does?
 
-1) Asks in the terminal for steamID64 profile to consider the inventory calculation
+1) Asks in the terminal for the steamID64 profile to consider the inventory calculation
 2) Asks in the terminal to choose the currency to consider in the calculation
 3) Does a request to get all the skin names and quantities from a user
 4) Does requests to get all the steam prices of those items (it uses a cache, so if a user has 2 or more of the same skin, it only does 
